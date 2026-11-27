@@ -78,4 +78,4 @@
 - 投稿内容は HTML エスケープして表示（スクリプト埋め込み対策）
 
 サイトのURL：
-GitHubリポジトリのURL：
+GitHubリポジトリのURL：https://github.com/saku0606/shinro-soudan-board
