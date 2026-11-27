@@ -3,19 +3,19 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>{% block title %}テスト前SOS掲示板{% endblock %}</title>
+  <title>{% block title %}進路のこと、匿名で聞いていい？{% endblock %}</title>
   <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 </head>
 <body>
   <header class="top">
     <a class="brand" href="{{ url_for('index') }}">
       <img src="{{ url_for('image', name='logo.png') }}" alt="" class="logo">
-      <span>テスト前SOS掲示板</span>
+      <span>進路のこと、匿名で聞いていい？</span>
     </a>
     {% if days_left is not none %}
-      <div class="countdown {% if days_left <= 3 %}hot{% endif %}">
+      <div class="countdown {% if days_left <= 30 %}hot{% endif %}">
         {% if days_left > 0 %}{{ test_name }}まで <strong>あと {{ days_left }} 日</strong>
-        {% elif days_left == 0 %}<strong>{{ test_name }} 当日！がんばれ！</strong>
+        {% elif days_left == 0 %}<strong>{{ test_name }} 当日！応援してるよ！</strong>
         {% else %}{{ test_name }} おつかれさま！{% endif %}
       </div>
     {% endif %}
@@ -23,7 +23,7 @@
   <main>
     {% block content %}{% endblock %}
   </main>
-  <footer>わからないは恥ずかしくない。みんなで教え合おう。
+  <footer>受験・進路の悩みを、匿名で。先輩と同級生がこたえる相談板。
     {% if store_kind == 'memory' %}<span class="note">（ローカル確認モード：データは再起動で消えます）</span>{% endif %}
   </footer>
 </body>

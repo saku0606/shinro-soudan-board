@@ -1,42 +1,50 @@
 {% extends "base.html" %}
-{% block title %}{{ post.title }} - テスト前SOS掲示板{% endblock %}
+{% block title %}{{ post.title }} - 進路のこと、匿名で聞いていい？{% endblock %}
 {% block content %}
-<p><a href="{{ url_for('index', subject=post.subject) }}">← {{ post.subject }}の質問一覧へ</a></p>
+<p><a href="{{ url_for('index', subject=post.subject) }}">← 「{{ post.subject }}」の相談一覧へ</a></p>
 
 <article class="card">
   <div class="tags">
     <span class="tag subj-{{ subjects.index(post.subject) + 1 if post.subject in subjects else 6 }}">{{ post.subject }}</span>
     <span class="tag grade">{{ post.grade }}</span>
-    {% if post.understood|int >= solved_at %}<span class="tag solved">✅ 解決済み</span>{% endif %}
+    {% if post.understood|int >= solved_at %}<span class="tag solved">⭐ 参考になる</span>{% endif %}
   </div>
   <h1>{{ post.title }}</h1>
-  <p class="meta">by {{ post.nickname }} ・ {{ post.created }}</p>
+  <p class="meta">{{ post.nickname }} ・ {{ post.created }}</p>
   <p class="body">{{ post.body }}</p>
   {% if post.image %}
-    <img class="photo" src="{{ url_for('image', name=post.image) }}" alt="質問の写真">
+    <img class="photo" src="{{ url_for('image', name=post.image) }}" alt="相談の画像">
   {% endif %}
   <form action="{{ url_for('understood', post_id=post.RowKey) }}" method="post" class="inline">
-    <button type="submit" class="understood">👍 わかった！ {{ post.understood }}</button>
-    <span class="hint">回答を読んで理解できたら押してね（{{ solved_at }}つで解決済み）</span>
+    <button type="submit" class="understood">👍 参考になった！ {{ post.understood }}</button>
+    <span class="hint">自分にも役立ったら押してね（{{ solved_at }}つで「参考になる」バッジ）</span>
   </form>
 </article>
 
 <h2 id="replies">💬 回答（{{ replies|length }}）</h2>
 {% for r in replies %}
-  <div class="card reply">
+  <div class="card reply {% if r.senpai %}senpai{% endif %}">
+    <div class="tags">
+      {% if r.senpai %}<span class="tag senpai-badge">🎓 先輩</span>{% endif %}
+      {% if r.grade %}<span class="tag grade">{{ r.grade }}</span>{% endif %}
+    </div>
     <p class="meta">{{ r.nickname }} ・ {{ r.created }}</p>
     <p class="body">{{ r.body }}</p>
   </div>
 {% else %}
-  <p class="empty">まだ回答がありません。わかる人は教えてあげよう！</p>
+  <p class="empty">まだ回答がありません。経験がある人はぜひ教えてあげて！</p>
 {% endfor %}
 
 <div class="card form">
   <h3>回答する</h3>
   <form action="{{ url_for('reply', post_id=post.RowKey) }}" method="post">
-    <label>ニックネーム<input name="nickname" maxlength="20" placeholder="ななしさん"></label>
-    <label>回答<textarea name="body" rows="4" maxlength="2000" required placeholder="答えだけでなく、考え方も書くと伝わりやすいよ"></textarea></label>
+    <div class="row two">
+      <label>ニックネーム（空欄OK）<input name="nickname" maxlength="20" placeholder="匿名さん"></label>
+      <label>自分の学年<select name="grade">{% for g in reply_grades %}<option>{{ g }}</option>{% endfor %}</select></label>
+    </div>
+    <label>回答<textarea name="body" rows="4" maxlength="2000" required placeholder="自分の経験や、そのときどう決めたかを書くと伝わりやすいよ"></textarea></label>
     <button type="submit">回答する</button>
   </form>
+  <p class="hint">相談者より上の学年か「卒業生」を選ぶと「🎓 先輩」バッジが付きます</p>
 </div>
 {% endblock %}

@@ -8,18 +8,19 @@
 </nav>
 
 <details class="card form" {% if error or not posts %}open{% endif %}>
-  <summary>✏️ 質問する</summary>
+  <summary>✏️ 匿名で相談する</summary>
+  <p class="hint">🔒 登録不要・ニックネームも空欄でOK。本名・学校名・連絡先は書かないでね。</p>
   {% if error %}<p class="error">{{ error }}</p>{% endif %}
   <form action="{{ url_for('create_post') }}" method="post" enctype="multipart/form-data">
     <div class="row">
-      <label>ニックネーム<input name="nickname" maxlength="20" placeholder="ななしさん"></label>
+      <label>ニックネーム（空欄OK）<input name="nickname" maxlength="20" placeholder="匿名さん"></label>
       <label>学年<select name="grade">{% for g in grades %}<option>{{ g }}</option>{% endfor %}</select></label>
-      <label>科目<select name="subject">{% for s in subjects %}<option {% if current == s %}selected{% endif %}>{{ s }}</option>{% endfor %}</select></label>
+      <label>分野<select name="subject">{% for s in subjects %}<option {% if current == s %}selected{% endif %}>{{ s }}</option>{% endfor %}</select></label>
     </div>
-    <label>タイトル<input name="title" maxlength="60" required placeholder="例：二次関数の最大・最小がわからない"></label>
-    <label>本文<textarea name="body" rows="4" maxlength="2000" required placeholder="どこまでわかって、どこからわからないかを書くと答えてもらいやすいよ"></textarea></label>
-    <label>写真（問題集やノート・任意）<input type="file" name="image" accept="image/jpeg,image/png,image/gif,image/webp"></label>
-    <button type="submit">質問を投稿する</button>
+    <label>タイトル<input name="title" maxlength="60" required placeholder="例：情報系と機械系で迷っています"></label>
+    <label>本文<textarea name="body" rows="4" maxlength="2000" required placeholder="今の状況と、何に迷っているかを書くと答えてもらいやすいよ"></textarea></label>
+    <label>画像（模試の結果など・任意／個人情報は隠してね）<input type="file" name="image" accept="image/jpeg,image/png,image/gif,image/webp"></label>
+    <button type="submit">相談する</button>
   </form>
 </details>
 
@@ -29,13 +30,13 @@
       <div class="tags">
         <span class="tag subj-{{ subjects.index(p.subject) + 1 if p.subject in subjects else 6 }}">{{ p.subject }}</span>
         <span class="tag grade">{{ p.grade }}</span>
-        {% if p.understood|int >= solved_at %}<span class="tag solved">✅ 解決済み</span>{% endif %}
+        {% if p.understood|int >= solved_at %}<span class="tag solved">⭐ 参考になる</span>{% endif %}
       </div>
       <h2>{{ p.title }}</h2>
-      <p class="meta">by {{ p.nickname }} ・ {{ p.created }} ・ 💬 回答 {{ p.replies }} ・ 👍 わかった！ {{ p.understood }}{% if p.image %} ・ 📷{% endif %}</p>
+      <p class="meta">{{ p.nickname }} ・ {{ p.created }} ・ 💬 回答 {{ p.replies }}{% if p.senpai|int %}（🎓先輩 {{ p.senpai }}）{% endif %} ・ 👍 参考になった！ {{ p.understood }}{% if p.image %} ・ 📷{% endif %}</p>
     </a>
   {% else %}
-    <p class="empty">{% if current %}{{ current }}の質問はまだありません。{% else %}まだ質問がありません。{% endif %}最初の質問をしてみよう！</p>
+    <p class="empty">{% if current %}「{{ current }}」の相談はまだありません。{% else %}まだ相談がありません。{% endif %}最初の相談をしてみよう！</p>
   {% endfor %}
 </section>
 {% endblock %}

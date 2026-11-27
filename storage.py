@@ -92,7 +92,7 @@ class AzureStore:
 
 
 class Board:
-    """掲示板の操作（質問・回答・わかった！）"""
+    """相談板の操作（相談・回答・参考になった！）"""
 
     def __init__(self):
         self.store = AzureStore(CONN) if CONN else MemoryStore()
@@ -116,7 +116,7 @@ class Board:
             "PartitionKey": "post", "RowKey": post_id,
             "nickname": nickname, "grade": grade, "subject": subject,
             "title": title, "body": body, "created": _now(),
-            "replies": 0, "understood": 0, "image": "",
+            "replies": 0, "senpai": 0, "understood": 0, "image": "",
         }
         if image:
             data, content_type, ext = image
@@ -130,15 +130,18 @@ class Board:
         # 回答は古い順に表示したいので逆順
         return list(reversed(self.store._query(f"reply-{post_id}")))
 
-    def add_reply(self, post_id, nickname, body):
+    def add_reply(self, post_id, nickname, grade, senpai, body):
         post = self.get_post(post_id)
         if not post:
             return False
         self.store._upsert({
             "PartitionKey": f"reply-{post_id}", "RowKey": _new_key(),
-            "nickname": nickname, "body": body, "created": _now(),
+            "nickname": nickname, "grade": grade, "senpai": senpai,
+            "body": body, "created": _now(),
         })
         post["replies"] = int(post.get("replies", 0)) + 1
+        if senpai:
+            post["senpai"] = int(post.get("senpai", 0)) + 1
         self.store._upsert(post)
         return True
 

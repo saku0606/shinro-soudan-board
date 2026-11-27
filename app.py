@@ -10,16 +10,18 @@ app.config["MAX_CONTENT_LENGTH"] = 6 * 1024 * 1024  # 画像は5MBまで（少�
 
 board = Board()
 
-SUBJECTS = ["数学", "英語", "国語", "理科", "社会", "その他"]
+SUBJECTS = ["文系", "理系", "医療・看護", "芸術・スポーツ", "就職・専門", "勉強法・メンタル"]  # 志望分野タグ
 GRADES = ["1年", "2年", "3年"]
-SOLVED_AT = 3  # 「わかった！」がこの数以上で解決済み
+REPLY_GRADES = GRADES + ["卒業生"]  # 回答者は卒業生も選べる
+RANK = {g: i for i, g in enumerate(REPLY_GRADES)}
+SOLVED_AT = 3  # 「参考になった！」がこの数以上で「参考になる」バッジ
 ALLOWED_IMAGES = {
     "image/jpeg": ".jpg", "image/png": ".png",
     "image/gif": ".gif", "image/webp": ".webp",
 }
-# テスト日は App Service の環境変数 TEST_DATE（例: 2026-12-08）で変更できる
-TEST_NAME = os.environ.get("TEST_NAME", "期末テスト")
-TEST_DATE = os.environ.get("TEST_DATE", "2026-12-08")
+# 受験日は App Service の環境変数 TEST_DATE（例: 2027-01-16）で変更できる
+TEST_NAME = os.environ.get("TEST_NAME", "共通テスト")
+TEST_DATE = os.environ.get("TEST_DATE", "2027-01-16")
 
 
 def days_left():
@@ -33,7 +35,7 @@ def days_left():
 @app.context_processor
 def common():
     return {
-        "subjects": SUBJECTS, "grades": GRADES, "solved_at": SOLVED_AT,
+        "subjects": SUBJECTS, "grades": GRADES, "reply_grades": REPLY_GRADES, "solved_at": SOLVED_AT,
         "test_name": TEST_NAME, "days_left": days_left(), "store_kind": board.kind,
     }
 
@@ -53,9 +55,9 @@ def index():
 
 @app.route("/post", methods=["POST"])
 def create_post():
-    nickname = clean("nickname", 20) or "ななしさん"
+    nickname = clean("nickname", 20) or "匿名さん"
     grade = request.form.get("grade") if request.form.get("grade") in GRADES else GRADES[0]
-    subject = request.form.get("subject") if request.form.get("subject") in SUBJECTS else "その他"
+    subject = request.form.get("subject") if request.form.get("subject") in SUBJECTS else SUBJECTS[0]
     title = clean("title", 60)
     body = clean("body", 2000)
     if not title or not body:
@@ -87,8 +89,12 @@ def detail(post_id):
 @app.route("/p/<post_id>/reply", methods=["POST"])
 def reply(post_id):
     body = clean("body", 2000)
-    if body:
-        board.add_reply(post_id, clean("nickname", 20) or "ななしさん", body)
+    post = board.get_post(post_id)
+    if body and post:
+        grade = request.form.get("grade") if request.form.get("grade") in REPLY_GRADES else GRADES[0]
+        # 相談者より上の学年、または卒業生なら「先輩」
+        senpai = RANK[grade] > RANK.get(post.get("grade"), 0)
+        board.add_reply(post_id, clean("nickname", 20) or "匿名さん", grade, senpai, body)
     return redirect(url_for("detail", post_id=post_id) + "#replies")
 
 

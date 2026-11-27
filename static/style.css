@@ -59,3 +59,11 @@ footer { text-align: center; color: var(--sub); font-size: .8rem; padding: 24px 
 .note { display: block; }
 
 @media (max-width: 560px) { .form .row { grid-template-columns: 1fr 1fr; } .form .row label:first-child { grid-column: 1 / -1; } }
+
+/* 進路相談板用 */
+:root { --accent: #3d6bff; }
+.top { background: #1d2a5c; }
+.countdown.hot { background: #e8543f; }
+.form .row.two { grid-template-columns: 2fr 1fr; }
+.reply.senpai { border-left: 4px solid #f0a500; }
+.tag.senpai-badge { background: #fff1c9; color: #8a5a00; }
