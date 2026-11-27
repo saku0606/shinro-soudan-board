@@ -77,5 +77,5 @@
 - 画像は jpg / png / gif / webp のみ、5MB まで
 - 投稿内容は HTML エスケープして表示（スクリプト埋め込み対策）
 
-サイトのURL：
+サイトのURL：https://shinro-soudan-saku-c6hnctemgfb2gcd7.koreacentral-01.azurewebsites.net/
 GitHubリポジトリのURL：https://github.com/saku0606/shinro-soudan-board
