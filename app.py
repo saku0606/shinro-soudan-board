@@ -109,7 +109,7 @@ def image(name):
     """Blob Storage の画像を取り出して表示する"""
     found = board.load_image(name)
     if not found:
-        if name == "logo.png":  # Blob にロゴがまだ無いときは同梱のロゴを使う
+        if name == "logo.svg":  # ローカル確認時（Blob 無し）は同梱のロゴを使う
             return redirect(url_for("static", filename="logo.svg"))
         abort(404)
     data, content_type = found

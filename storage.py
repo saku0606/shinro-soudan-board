@@ -13,6 +13,7 @@ JST = timezone(timedelta(hours=9))
 CONN = os.environ.get("AZURE_STORAGE_CONNECTION_STRING", "")
 TABLE_NAME = "posts"
 CONTAINER = "images"
+LOGO = "logo.svg"  # Blob Storage に置くロゴ画像の名前
 
 
 def _now():
@@ -61,6 +62,10 @@ class AzureStore:
         self.container = blob_service.get_container_client(CONTAINER)
         if not self.container.exists():
             self.container.create_container()
+        # ロゴ画像が Blob にまだ無ければ、同梱のロゴをアップロードしておく
+        if not self.container.get_blob_client(LOGO).exists():
+            with open(os.path.join(os.path.dirname(__file__), "static", "logo.svg"), "rb") as f:
+                self.save_image(LOGO, f.read(), "image/svg+xml")
 
     def _query(self, pk):
         rows = self.table.query_entities("PartitionKey eq @pk", parameters={"pk": pk})
