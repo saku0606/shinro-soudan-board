@@ -1,0 +1,42 @@
+{% extends "base.html" %}
+{% block title %}{{ post.title }} - テスト前SOS掲示板{% endblock %}
+{% block content %}
+<p><a href="{{ url_for('index', subject=post.subject) }}">← {{ post.subject }}の質問一覧へ</a></p>
+
+<article class="card">
+  <div class="tags">
+    <span class="tag subj-{{ subjects.index(post.subject) + 1 if post.subject in subjects else 6 }}">{{ post.subject }}</span>
+    <span class="tag grade">{{ post.grade }}</span>
+    {% if post.understood|int >= solved_at %}<span class="tag solved">✅ 解決済み</span>{% endif %}
+  </div>
+  <h1>{{ post.title }}</h1>
+  <p class="meta">by {{ post.nickname }} ・ {{ post.created }}</p>
+  <p class="body">{{ post.body }}</p>
+  {% if post.image %}
+    <img class="photo" src="{{ url_for('image', name=post.image) }}" alt="質問の写真">
+  {% endif %}
+  <form action="{{ url_for('understood', post_id=post.RowKey) }}" method="post" class="inline">
+    <button type="submit" class="understood">👍 わかった！ {{ post.understood }}</button>
+    <span class="hint">回答を読んで理解できたら押してね（{{ solved_at }}つで解決済み）</span>
+  </form>
+</article>
+
+<h2 id="replies">💬 回答（{{ replies|length }}）</h2>
+{% for r in replies %}
+  <div class="card reply">
+    <p class="meta">{{ r.nickname }} ・ {{ r.created }}</p>
+    <p class="body">{{ r.body }}</p>
+  </div>
+{% else %}
+  <p class="empty">まだ回答がありません。わかる人は教えてあげよう！</p>
+{% endfor %}
+
+<div class="card form">
+  <h3>回答する</h3>
+  <form action="{{ url_for('reply', post_id=post.RowKey) }}" method="post">
+    <label>ニックネーム<input name="nickname" maxlength="20" placeholder="ななしさん"></label>
+    <label>回答<textarea name="body" rows="4" maxlength="2000" required placeholder="答えだけでなく、考え方も書くと伝わりやすいよ"></textarea></label>
+    <button type="submit">回答する</button>
+  </form>
+</div>
+{% endblock %}

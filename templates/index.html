@@ -1,0 +1,41 @@
+{% extends "base.html" %}
+{% block content %}
+<nav class="tabs">
+  <a href="{{ url_for('index') }}" class="{% if not current %}on{% endif %}">すべて</a>
+  {% for s in subjects %}
+    <a href="{{ url_for('index', subject=s) }}" class="subj-{{ loop.index }} {% if current == s %}on{% endif %}">{{ s }}</a>
+  {% endfor %}
+</nav>
+
+<details class="card form" {% if error or not posts %}open{% endif %}>
+  <summary>✏️ 質問する</summary>
+  {% if error %}<p class="error">{{ error }}</p>{% endif %}
+  <form action="{{ url_for('create_post') }}" method="post" enctype="multipart/form-data">
+    <div class="row">
+      <label>ニックネーム<input name="nickname" maxlength="20" placeholder="ななしさん"></label>
+      <label>学年<select name="grade">{% for g in grades %}<option>{{ g }}</option>{% endfor %}</select></label>
+      <label>科目<select name="subject">{% for s in subjects %}<option {% if current == s %}selected{% endif %}>{{ s }}</option>{% endfor %}</select></label>
+    </div>
+    <label>タイトル<input name="title" maxlength="60" required placeholder="例：二次関数の最大・最小がわからない"></label>
+    <label>本文<textarea name="body" rows="4" maxlength="2000" required placeholder="どこまでわかって、どこからわからないかを書くと答えてもらいやすいよ"></textarea></label>
+    <label>写真（問題集やノート・任意）<input type="file" name="image" accept="image/jpeg,image/png,image/gif,image/webp"></label>
+    <button type="submit">質問を投稿する</button>
+  </form>
+</details>
+
+<section class="list">
+  {% for p in posts %}
+    <a class="card post" href="{{ url_for('detail', post_id=p.RowKey) }}">
+      <div class="tags">
+        <span class="tag subj-{{ subjects.index(p.subject) + 1 if p.subject in subjects else 6 }}">{{ p.subject }}</span>
+        <span class="tag grade">{{ p.grade }}</span>
+        {% if p.understood|int >= solved_at %}<span class="tag solved">✅ 解決済み</span>{% endif %}
+      </div>
+      <h2>{{ p.title }}</h2>
+      <p class="meta">by {{ p.nickname }} ・ {{ p.created }} ・ 💬 回答 {{ p.replies }} ・ 👍 わかった！ {{ p.understood }}{% if p.image %} ・ 📷{% endif %}</p>
+    </a>
+  {% else %}
+    <p class="empty">{% if current %}{{ current }}の質問はまだありません。{% else %}まだ質問がありません。{% endif %}最初の質問をしてみよう！</p>
+  {% endfor %}
+</section>
+{% endblock %}

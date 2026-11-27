@@ -1,0 +1,7 @@
+.venv/
+__pycache__/
+*.pyc
+.env
+*.PublishSettings
+.DS_Store
+.claude/
