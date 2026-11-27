@@ -5,3 +5,9 @@ __pycache__/
 *.PublishSettings
 .DS_Store
 .claude/
+# 大きいファイル・一時ファイル
+*.log
+*.zip
+*.mp4
+*.mov
+*.m4v
